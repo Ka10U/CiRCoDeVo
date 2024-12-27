@@ -15,13 +15,15 @@ const Register = () => {
                 password,
             });
             alert("Registration successful");
+            console.log(response.data);
         } catch (error) {
+            console.log("error: ", error);
             alert("Registration failed");
         }
     };
 
     return (
-        <div>
+        <div className="auth-form">
             <h2>Register</h2>
             <form onSubmit={handleSubmit}>
                 <input

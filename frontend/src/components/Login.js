@@ -13,13 +13,14 @@ const Login = () => {
                 password,
             });
             alert("Login successful");
+            console.log(response.data);
         } catch (error) {
             alert("Login failed");
         }
     };
 
     return (
-        <div>
+        <div className="auth-form">
             <h2>Login</h2>
             <form onSubmit={handleSubmit}>
                 <input

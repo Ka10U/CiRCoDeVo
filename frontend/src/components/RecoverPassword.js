@@ -11,13 +11,14 @@ const RecoverPassword = () => {
                 email,
             });
             alert("Recovery email sent");
+            console.log(response.data);
         } catch (error) {
             alert("Recovery failed");
         }
     };
 
     return (
-        <div>
+        <div className="auth-form">
             <h2>Recover Password</h2>
             <form onSubmit={handleSubmit}>
                 <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required />

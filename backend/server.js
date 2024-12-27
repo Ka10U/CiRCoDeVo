@@ -17,6 +17,7 @@ app.post("/register", (req, res) => {
 
     db.run("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", [username, email, hashedPassword], function (err) {
         if (err) {
+            console.log("register error: ", err);
             return res.status(500).json({ error: err.message });
         }
         res.json({ id: this.lastID });

@@ -13,13 +13,14 @@ const ResetPassword = () => {
                 password,
             });
             alert("Password reset successful");
+            console.log(response.data);
         } catch (error) {
             alert("Password reset failed");
         }
     };
 
     return (
-        <div>
+        <div className="auth-form">
             <h2>Reset Password</h2>
             <form onSubmit={handleSubmit}>
                 <input

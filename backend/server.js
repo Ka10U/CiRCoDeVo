@@ -4,11 +4,13 @@ const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const db = require("./db");
 const dotenv = require("dotenv");
+const cors = require("cors");
 
 dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
+app.use(cors());
 
 // Route pour enregistrer un nouvel utilisateur
 app.post("/register", (req, res) => {

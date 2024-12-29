@@ -90,6 +90,74 @@ app.post("/recover-password", (req, res) => {
     );
 });
 
+// Route pour la réinitialisation de mot de passe
+app.post("/reset/:token", (req, res) => {
+    const { token } = req.params;
+    const { password } = req.body;
+    const hashedPassword = bcrypt.hashSync(password, 10);
+
+    db.run(
+        "UPDATE users SET password = ?, temp_password_expiration = NULL WHERE password = ? AND temp_password_expiration > ?",
+        [hashedPassword, token, Date.now()],
+        function (err) {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            if (this.changes === 0) {
+                return res.status(400).json({ error: "Invalid or expired token" });
+            }
+            res.json({ message: "Password reset successful" });
+        }
+    );
+});
+
+// Route pour créer un sondage
+app.post("/polls/create", (req, res) => {
+    const { userId, title, choices, votingPeriodEnd } = req.body;
+    const choicesString = JSON.stringify(choices);
+
+    db.run(
+        "INSERT INTO polls (creator_id, title, choices, voting_period_end) VALUES (?, ?, ?, ?)",
+        [userId, title, choicesString, votingPeriodEnd],
+        function (err) {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            res.json({ id: this.lastID });
+        }
+    );
+});
+
+// Route pour afficher un sondage
+app.get("/poll/:id", (req, res) => {
+    const { id } = req.params;
+
+    db.get("SELECT * FROM polls WHERE id = ?", [id], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: "Poll not found" });
+        }
+        res.json(row);
+    });
+});
+
+// Route pour afficher les données utilisateur
+app.get("/user/:id", (req, res) => {
+    const { id } = req.params;
+
+    db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        res.json(row);
+    });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

@@ -7,7 +7,18 @@ db.serialize(() => {
         username TEXT UNIQUE,
         email TEXT UNIQUE,
         password TEXT,
-        temp_password_expiration INTEGER
+        temp_password_expiration INTEGER,
+        created_polls TEXT,
+        participated_polls TEXT
+    )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS polls (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        creator_id INTEGER,
+        title TEXT,
+        choices TEXT,
+        voting_period_end INTEGER,
+        FOREIGN KEY (creator_id) REFERENCES users (id)
     )`);
 });
 

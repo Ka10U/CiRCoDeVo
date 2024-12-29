@@ -7,6 +7,9 @@ import Logout from "./components/Logout";
 import RecoverPassword from "./components/RecoverPassword";
 import ResetPassword from "./components/ResetPassword";
 import Landing from "./components/Landing";
+import CreatePoll from "./components/CreatePoll";
+import Poll from "./components/Poll";
+import UserProfile from "./components/UserProfile";
 import NavMenu from "./components/NavMenu";
 import AuthContext from "./components/AuthContext";
 
@@ -23,6 +26,9 @@ function App() {
                         <Route path="/logout" element={<Logout />}></Route>
                         <Route path="/recover" element={<RecoverPassword />}></Route>
                         <Route path="/reset/:token" element={<ResetPassword />}></Route>
+                        <Route path="/polls/create" component={<CreatePoll />} />
+                        <Route path="/poll/:id" component={<Poll />} />
+                        <Route path="/user/:id" component={<UserProfile />} />
                     </Routes>
                 </AuthContext>
             </div>

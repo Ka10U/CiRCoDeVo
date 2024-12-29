@@ -12,6 +12,16 @@ const NavMenu = () => {
                 </li>
                 {isAuthenticated && (
                     <li>
+                        <a href="/polls/create">Créer</a>
+                    </li>
+                )}
+                {isAuthenticated && (
+                    <li>
+                        <a href="/user">Profile</a>
+                    </li>
+                )}
+                {isAuthenticated && (
+                    <li>
                         <a href="/logout">Logout</a>
                     </li>
                 )}

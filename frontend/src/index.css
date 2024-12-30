@@ -124,3 +124,19 @@ nav {
     margin-top: 64px;
     gap: 24px;
 }
+
+.choice {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 24px;
+}
+
+.choice button {
+    background-color: darkred;
+    color: white;
+    font-weight: 700;
+    width: 40px;
+    height: 40px;
+    border-radius: 4px;
+}

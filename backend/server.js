@@ -3,6 +3,7 @@ const bodyParser = require("body-parser");
 const bcrypt = require("bcryptjs");
 const nodemailer = require("nodemailer");
 const db = require("./db");
+const { v4: uuidv4 } = require("uuid");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
@@ -16,14 +17,18 @@ app.use(cors());
 app.post("/register", (req, res) => {
     const { username, email, password } = req.body;
     const hashedPassword = bcrypt.hashSync(password, 10);
+    const userId = uuidv4();
 
-    db.run("INSERT INTO users (username, email, password) VALUES (?, ?, ?)", [username, email, hashedPassword], function (err) {
-        if (err) {
-            console.log("register error: ", err);
-            return res.status(500).json({ error: err.message });
+    db.run(
+        "INSERT INTO users (id, username, email, password) VALUES (?, ?, ?, ?)",
+        [userId, username, email, hashedPassword],
+        function (err) {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            res.json({ id: userId });
         }
-        res.json({ id: this.lastID });
-    });
+    );
 });
 
 // Route pour l'authentification des utilisateurs
@@ -114,16 +119,17 @@ app.post("/reset/:token", (req, res) => {
 // Route pour créer un sondage
 app.post("/polls/create", (req, res) => {
     const { userId, title, choices, votingPeriodEnd } = req.body;
-    const choicesString = JSON.stringify(choices);
+    const pollId = uuidv4();
+    const questionsString = JSON.stringify(questions);
 
     db.run(
-        "INSERT INTO polls (creator_id, title, choices, voting_period_end) VALUES (?, ?, ?, ?)",
-        [userId, title, choicesString, votingPeriodEnd],
+        "INSERT INTO polls (id, creator_id, title, questions, voting_period_start, voting_period_end) VALUES (?, ?, ?, ?, ?, ?)",
+        [pollId, userId, title, questionsString, votingPeriodStart, votingPeriodEnd],
         function (err) {
             if (err) {
                 return res.status(500).json({ error: err.message });
             }
-            res.json({ id: this.lastID });
+            res.json({ id: pollId });
         }
     );
 });

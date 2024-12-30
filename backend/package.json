@@ -8,6 +8,7 @@
     "express": "^4.21.2",
     "nodemailer": "^6.9.16",
     "react-router-dom": "^7.1.0",
-    "sqlite3": "^5.1.7"
+    "sqlite3": "^5.1.7",
+    "uuid": "^11.0.3"
   }
 }

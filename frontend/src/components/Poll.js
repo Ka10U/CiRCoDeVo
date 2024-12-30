@@ -19,15 +19,15 @@ const Poll = () => {
         fetchPoll();
     }, [id]);
 
-    const handleVote = (choiceIndex) => {
-        setVotes({ ...votes, [choiceIndex]: (votes[choiceIndex] || 0) + 1 });
+    const handleVote = (questionIndex, choiceIndex) => {
+        setVotes({ ...votes, [questionIndex]: choiceIndex });
     };
 
     if (!poll) {
         return <div>Loading...</div>;
     }
 
-    const choices = JSON.parse(poll.choices);
+    const questions = JSON.parse(poll.questions);
     const isVotingPeriodOver = Date.now() > poll.voting_period_end;
 
     return (
@@ -36,18 +36,62 @@ const Poll = () => {
             {isVotingPeriodOver ? (
                 <div>
                     <h3>Results</h3>
-                    {choices.map((choice, index) => (
+                    {questions.map((question, index) => (
                         <div key={index}>
-                            {choice}: {votes[index] || 0} votes
+                            <h4>{question.text}</h4>
+                            {question.type === "referendum" && (
+                                <div>
+                                    <p>Oui: {votes[index] === 0 ? "Voted" : "Not Voted"}</p>
+                                    <p>Non: {votes[index] === 1 ? "Voted" : "Not Voted"}</p>
+                                </div>
+                            )}
+                            {question.type === "ranked_choice" && (
+                                <div>
+                                    {question.choices.map((choice, choiceIndex) => (
+                                        <p key={choiceIndex}>
+                                            {choice}: {votes[index] === choiceIndex ? "Voted" : "Not Voted"}
+                                        </p>
+                                    ))}
+                                </div>
+                            )}
+                            {question.type === "value" && (
+                                <div>
+                                    <p>Value: {votes[index] || "Not Voted"}</p>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
             ) : (
                 <div>
                     <h3>Vote</h3>
-                    {choices.map((choice, index) => (
+                    {questions.map((question, index) => (
                         <div key={index}>
-                            <button onClick={() => handleVote(index)}>{choice}</button>
+                            <h4>{question.text}</h4>
+                            {question.type === "referendum" && (
+                                <div>
+                                    <button onClick={() => handleVote(index, 0)}>Oui</button>
+                                    <button onClick={() => handleVote(index, 1)}>Non</button>
+                                </div>
+                            )}
+                            {question.type === "ranked_choice" && (
+                                <div>
+                                    {question.choices.map((choice, choiceIndex) => (
+                                        <button key={choiceIndex} onClick={() => handleVote(index, choiceIndex)}>
+                                            {choice}
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                            {question.type === "value" && (
+                                <div>
+                                    <input
+                                        type="number"
+                                        value={votes[index] || ""}
+                                        onChange={(e) => handleVote(index, e.target.value)}
+                                    />
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>

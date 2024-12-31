@@ -118,13 +118,14 @@ app.post("/reset/:token", (req, res) => {
 
 // Route pour créer un sondage
 app.post("/polls/create", (req, res) => {
-    const { userId, title, choices, votingPeriodEnd } = req.body;
+    const { userId, title, questions, votingPeriodStart, votingPeriodEnd, categories } = req.body;
     const pollId = uuidv4();
     const questionsString = JSON.stringify(questions);
+    const categoriesString = JSON.stringify(categories);
 
     db.run(
-        "INSERT INTO polls (id, creator_id, title, questions, voting_period_start, voting_period_end) VALUES (?, ?, ?, ?, ?, ?)",
-        [pollId, userId, title, questionsString, votingPeriodStart, votingPeriodEnd],
+        "INSERT INTO polls (id, creator_id, title, questions, voting_period_start, voting_period_end, categories) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [pollId, userId, title, questionsString, votingPeriodStart, votingPeriodEnd, categoriesString],
         function (err) {
             if (err) {
                 return res.status(500).json({ error: err.message });

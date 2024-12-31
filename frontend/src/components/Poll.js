@@ -28,11 +28,13 @@ const Poll = () => {
     }
 
     const questions = JSON.parse(poll.questions);
+    const categories = JSON.parse(poll.categories);
     const isVotingPeriodOver = Date.now() > poll.voting_period_end;
 
     return (
         <div>
             <h2>{poll.title}</h2>
+            <p>Categories: {categories.join(", ")}</p>
             {isVotingPeriodOver ? (
                 <div>
                     <h3>Results</h3>

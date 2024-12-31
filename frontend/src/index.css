@@ -125,18 +125,36 @@ nav {
     gap: 24px;
 }
 
-.choice {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 24px;
-}
-
-.choice button {
+button.remove {
     background-color: darkred;
     color: white;
     font-weight: 700;
     width: 40px;
     height: 40px;
     border-radius: 4px;
+}
+
+.create-poll {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 64px;
+    gap: 24px;
+}
+
+.categories-list {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    padding: 2px;
+    border-radius: 8px;
+    background: #55BADA;
+}
+
+.categories-list label:has(input:checked) {
+    background: #BADA55;
 }

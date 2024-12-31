@@ -7,7 +7,7 @@ db.serialize(() => {
         id TEXT PRIMARY KEY,
         username TEXT UNIQUE,
         email TEXT UNIQUE,
-        password TEXT,)...
+        password TEXT,
         temp_password_expiration INTEGER,
         created_polls TEXT,
         participated_polls TEXT
@@ -20,6 +20,7 @@ db.serialize(() => {
         questions TEXT,
         voting_period_start INTEGER,
         voting_period_end INTEGER,
+        categories TEXT,
         FOREIGN KEY (creator_id) REFERENCES users (id)
     )`);
 

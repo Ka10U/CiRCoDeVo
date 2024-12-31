@@ -26,9 +26,9 @@ function App() {
                         <Route path="/logout" element={<Logout />}></Route>
                         <Route path="/recover" element={<RecoverPassword />}></Route>
                         <Route path="/reset/:token" element={<ResetPassword />}></Route>
-                        <Route path="/polls/create" component={<CreatePoll />} />
-                        <Route path="/poll/:id" component={<Poll />} />
-                        <Route path="/user/:id" component={<UserProfile />} />
+                        <Route path="/polls/create" element={<CreatePoll />} />
+                        <Route path="/poll/:id" element={<Poll />} />
+                        <Route path="/user/:id" element={<UserProfile />} />
                     </Routes>
                 </AuthContext>
             </div>

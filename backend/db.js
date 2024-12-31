@@ -21,6 +21,7 @@ db.serialize(() => {
         voting_period_start INTEGER,
         voting_period_end INTEGER,
         categories TEXT,
+        image_url TEXT,
         FOREIGN KEY (creator_id) REFERENCES users (id)
     )`);
 

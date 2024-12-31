@@ -1,8 +1,23 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { AuthContext } from "./AuthContext";
+import axios from "axios";
+import PollCard from "./PollCard";
 
 const Landing = () => {
     const { isAuthenticated } = useContext(AuthContext);
+    const [featuredPolls, setFeaturedPolls] = useState([]);
+
+    useEffect(() => {
+        const fetchFeaturedPolls = async () => {
+            try {
+                const response = await axios.get("http://localhost:3000/polls/featured");
+                setFeaturedPolls(response.data);
+            } catch (error) {
+                alert("Failed to fetch featured polls");
+            }
+        };
+        fetchFeaturedPolls();
+    }, []);
 
     return (
         <div className="landinghero">
@@ -21,6 +36,14 @@ const Landing = () => {
                         This web platform aims at promoting Collective Intelligence and provides a technical solution based upon
                         Ranked Choice Voting with optional vote Delegation.
                     </p>
+                    <div>
+                        <h2>Featured Polls</h2>
+                        <div className="poll-list">
+                            {featuredPolls.map((poll) => (
+                                <PollCard key={poll.id} poll={poll} />
+                            ))}
+                        </div>
+                    </div>
                 </>
             )}
         </div>

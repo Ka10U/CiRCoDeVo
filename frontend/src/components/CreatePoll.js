@@ -10,7 +10,8 @@ const CreatePoll = () => {
     const [votingPeriodStart, setVotingPeriodStart] = useState(new Date(Date.now()).toISOString());
     const [votingPeriodEnd, setVotingPeriodEnd] = useState("");
     const [categories, setCategories] = useState([]);
-    const { isAuthenticated } = useContext(AuthContext);
+    const [image, setImage] = useState(null);
+    const { isAuthenticated, userId } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const handleAddQuestion = () => {
@@ -48,21 +49,31 @@ const CreatePoll = () => {
         );
     };
 
+    const handleImageChange = (e) => {
+        setImage(e.target.files[0]);
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log(questions);
         if (!isAuthenticated) {
             alert("You must be logged in to create a poll");
             return;
         }
+
+        const formData = new FormData();
+        formData.append("image", image);
+        formData.append("userId", userId); // Remplacez par l'ID de l'utilisateur authentifié
+        formData.append("title", title);
+        formData.append("questions", JSON.stringify(questions));
+        formData.append("votingPeriodStart", votingPeriodStart);
+        formData.append("votingPeriodEnd", votingPeriodEnd);
+        formData.append("categories", JSON.stringify(categories));
+
         try {
-            const response = await axios.post("http://localhost:3000/polls/create", {
-                userId: 1, // Remplacez par l'ID de l'utilisateur authentifié
-                title,
-                questions,
-                votingPeriodStart,
-                votingPeriodEnd,
-                categories,
+            const response = await axios.post("http://localhost:3000/polls/create", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
             });
             alert("Poll created successfully");
             console.log(response.data);
@@ -110,6 +121,7 @@ const CreatePoll = () => {
                             </label>
                         ))}
                     </div>
+                    <input type="file" onChange={handleImageChange} />
                     {questions.map((question, index) => (
                         <div className="question" key={index}>
                             <input

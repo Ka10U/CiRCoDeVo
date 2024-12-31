@@ -6,12 +6,26 @@ const db = require("./db");
 const { v4: uuidv4 } = require("uuid");
 const dotenv = require("dotenv");
 const cors = require("cors");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
 
 dotenv.config();
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
+
+// Configuration de Multer pour gérer les téléchargements de fichiers
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, "uploads/");
+    },
+    filename: (req, file, cb) => {
+        cb(null, `${uuidv4()}-${file.originalname}`);
+    },
+});
+const upload = multer({ storage });
 
 // Route pour enregistrer un nouvel utilisateur
 app.post("/register", (req, res) => {
@@ -117,15 +131,16 @@ app.post("/reset/:token", (req, res) => {
 });
 
 // Route pour créer un sondage
-app.post("/polls/create", (req, res) => {
+app.post("/polls/create", upload.single("image"), (req, res) => {
     const { userId, title, questions, votingPeriodStart, votingPeriodEnd, categories } = req.body;
     const pollId = uuidv4();
     const questionsString = JSON.stringify(questions);
     const categoriesString = JSON.stringify(categories);
+    const imageUrl = req.file ? `http://localhost:3000/uploads/${req.file.filename}` : null;
 
     db.run(
-        "INSERT INTO polls (id, creator_id, title, questions, voting_period_start, voting_period_end, categories) VALUES (?, ?, ?, ?, ?, ?, ?)",
-        [pollId, userId, title, questionsString, votingPeriodStart, votingPeriodEnd, categoriesString],
+        "INSERT INTO polls (id, creator_id, title, questions, voting_period_start, voting_period_end, categories, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [pollId, userId, title, questionsString, votingPeriodStart, votingPeriodEnd, categoriesString, imageUrl],
         function (err) {
             if (err) {
                 return res.status(500).json({ error: err.message });
@@ -150,6 +165,28 @@ app.get("/poll/:id", (req, res) => {
     });
 });
 
+// Route pour afficher les sondages créés par un utilisateur
+app.get("/polls/user/:id", (req, res) => {
+    const { id } = req.params;
+
+    db.all("SELECT * FROM polls WHERE creator_id = ?", [id], (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
+    });
+});
+
+// Route pour afficher les sondages mis en avant
+app.get("/polls/featured", (req, res) => {
+    db.all("SELECT * FROM polls ORDER BY RANDOM() LIMIT 5", (err, rows) => {
+        if (err) {
+            return res.status(500).json({ error: err.message });
+        }
+        res.json(rows);
+    });
+});
+
 // Route pour afficher les données utilisateur
 app.get("/user/:id", (req, res) => {
     const { id } = req.params;
@@ -164,6 +201,9 @@ app.get("/user/:id", (req, res) => {
         res.json(row);
     });
 });
+
+// Servir les images téléchargées
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

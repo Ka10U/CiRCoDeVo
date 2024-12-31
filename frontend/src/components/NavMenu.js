@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 
 const NavMenu = () => {
-    const { isAuthenticated } = useContext(AuthContext);
+    const { isAuthenticated, userId } = useContext(AuthContext);
 
     return (
         <nav>
@@ -17,7 +17,7 @@ const NavMenu = () => {
                 )}
                 {isAuthenticated && (
                     <li>
-                        <a href="/user">Profile</a>
+                        <a href={`/user/${userId}`}>Profile</a>
                     </li>
                 )}
                 {isAuthenticated && (

@@ -18,13 +18,14 @@ const Login = () => {
                 password,
             });
             setMessage("Login successful");
-            console.log(message);
             // Appeler la fonction de connexion du contexte d'authentification
-            login(response.data.token);
+            login(response.data.token, response.data.userId);
             // Rediriger vers la page d'accueil
             navigate("/");
         } catch (error) {
             setMessage("Login failed");
+        } finally {
+            console.log(message);
         }
     };
 

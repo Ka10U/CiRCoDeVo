@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 const PollCard = ({ poll }) => {
     const questions = JSON.parse(poll.questions);
     const categories = JSON.parse(poll.categories);
+    console.log(poll.id, categories);
+    categories.forEach((category, id) => console.log(id, category));
 
     return (
         <div className="poll-card">

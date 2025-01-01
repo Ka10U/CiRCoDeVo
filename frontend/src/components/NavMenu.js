@@ -1,5 +1,6 @@
 import React, { useContext } from "react";
 import { AuthContext } from "./AuthContext";
+import "./NavMenu.css";
 
 const NavMenu = () => {
     const { isAuthenticated, userId } = useContext(AuthContext);

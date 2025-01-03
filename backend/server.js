@@ -9,6 +9,7 @@ const cors = require("cors");
 const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
+const jwt = require("jsonwebtoken");
 
 dotenv.config();
 
@@ -61,7 +62,10 @@ app.post("/login", (req, res) => {
         if (!bcrypt.compareSync(password, row.password)) {
             return res.status(400).json({ error: "Invalid password" });
         }
-        res.json({ message: "Login successful" });
+        // Générer un token JWT
+        const token = jwt.sign({ userId: row.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+
+        res.json({ message: "Login successful", userId: row.id, token });
     });
 });
 

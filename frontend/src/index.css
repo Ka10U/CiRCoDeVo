@@ -31,8 +31,13 @@ nav {
 }
 
 .nav-menu * {
-    color: rgb(240,240,250);
+    color: rgb(240, 240, 250);
     text-decoration: none;
+}
+
+.App:not(:first-child) {
+    margin-left: 64px;
+    margin-right: 64px;
 }
 
 .auth-form {
@@ -126,12 +131,17 @@ nav {
 }
 
 button.remove {
-    background-color: darkred;
+    background-color: rgb(190, 15, 15);
     color: white;
     font-weight: 700;
     width: 40px;
     height: 40px;
     border-radius: 4px;
+    transition: all 0.2s;
+}
+
+button.remove:hover {
+    background-color: rgb(221, 69, 43);
 }
 
 .create-poll {
@@ -143,24 +153,56 @@ button.remove {
     gap: 24px;
 }
 
-.categories-list {
-    display: flex;
-    flex-direction: row;
+.create-poll form:first-child {
+    display: grid;
+    grid-template-columns: 1fr auto;
     justify-content: center;
     align-items: center;
-    gap: 4px;
+    gap: 12px;
+}
+
+.categories-list {
+    display: grid;
+    grid-template-columns: repeat(8, auto);
+    justify-content: center;
+    align-items: center;
+    grid-gap: 4px;
     font-size: 12px;
     padding: 2px;
     border-radius: 8px;
-    background: #55BADA;
+    background: #55bada;
     cursor: pointer;
 }
 
-.categories-list label:has(input:checked) {
-    background: #BADA55;
+.categories-list label:hover {
+    border: none;
+    transition: all 0.2s;
 }
 
-.App:not(:first-child) {
-    margin-left: 64px;
-    margin-right: 64px;
+.categories-list label:hover {
+    border: solid 1px white;
+}
+
+.categories-list label input {
+    visibility: hidden;
+}
+
+.categories-list label:has(input:checked) {
+    background: #bada55;
+}
+
+.question {
+    display: grid;
+    grid-template-columns: 1fr auto auto;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.choice {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
 }

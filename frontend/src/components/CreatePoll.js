@@ -108,7 +108,10 @@ const CreatePoll = () => {
             <h2>Create Poll</h2>
             <div className="create-poll">
                 <form onSubmit={handleSubmit}>
-                    <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                    <div>
+                        <input type="text" placeholder="Title" value={title} onChange={(e) => setTitle(e.target.value)} />
+                        <input type="file" onChange={handleImageChange} />
+                    </div>
                     <div className="categories-list">
                         {categoriesList.map((category) => (
                             <label key={category}>
@@ -121,24 +124,28 @@ const CreatePoll = () => {
                             </label>
                         ))}
                     </div>
-                    <input type="file" onChange={handleImageChange} />
                     {questions.map((question, index) => (
                         <div className="question" key={index}>
-                            <input
-                                // key={index}
-                                type="text"
-                                placeholder={`Question ${index + 1}`}
-                                value={question.text}
-                                onChange={(e) => handleQuestionChange(index, "text", e.target.value)}
-                            />
-                            <select value={question.type} onChange={(e) => handleQuestionChange(index, "type", e.target.value)}>
-                                <option value="referendum">Referendum</option>
-                                <option value="ranked_choice">Ranked Choice</option>
-                                <option value="value">Value</option>
-                            </select>
-                            <button className="remove" type="button" onClick={(e) => handleRemoveQuestion(index)}>
-                                X
-                            </button>
+                            <div>
+                                <input
+                                    // key={index}
+                                    type="text"
+                                    placeholder={`Question ${index + 1}`}
+                                    value={question.text}
+                                    onChange={(e) => handleQuestionChange(index, "text", e.target.value)}
+                                />
+                                <select
+                                    value={question.type}
+                                    onChange={(e) => handleQuestionChange(index, "type", e.target.value)}
+                                >
+                                    <option value="referendum">Referendum</option>
+                                    <option value="ranked_choice">Ranked Choice</option>
+                                    <option value="value">Value</option>
+                                </select>
+                                <button className="remove" type="button" onClick={(e) => handleRemoveQuestion(index)}>
+                                    X
+                                </button>
+                            </div>
                             {question.type === "ranked_choice" && (
                                 <div>
                                     {question.choices.map((choice, choiceIndex) => (

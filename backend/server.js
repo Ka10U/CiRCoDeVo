@@ -18,6 +18,7 @@ app.use(bodyParser.json());
 app.use(cors());
 
 console.log("Server starting up...");
+console.log("Web Token: ", process.env.JWT_SECRET);
 
 // Configuration de Multer pour gérer les téléchargements de fichiers
 const storage = multer.diskStorage({
@@ -41,6 +42,7 @@ app.post("/register", (req, res) => {
         [userId, username, email, hashedPassword],
         function (err) {
             if (err) {
+                console.log("Register Error: ", err);
                 return res.status(500).json({ error: err.message });
             }
             res.json({ id: userId });
@@ -54,17 +56,21 @@ app.post("/login", (req, res) => {
 
     db.get("SELECT * FROM users WHERE username = ?", [username], (err, row) => {
         if (err) {
+            console.log("Login Error: ", err);
             return res.status(500).json({ error: err.message });
         }
         if (!row) {
+            console.log("Login Error: User not found");
             return res.status(400).json({ error: "User not found" });
         }
         if (!bcrypt.compareSync(password, row.password)) {
+            console.log("Login Error: Invalid Password");
             return res.status(400).json({ error: "Invalid password" });
         }
         // Générer un token JWT
-        const token = jwt.sign({ userId: row.id }, process.env.JWT_SECRET, { expiresIn: "1h" });
+        const token = jwt.sign({ userId: row.id }, process.env.JWT_SECRET, { expiresIn: "24h" });
 
+        console.log("Login successful !!");
         res.json({ message: "Login successful", userId: row.id, token });
     });
 });
@@ -81,9 +87,11 @@ app.post("/recover-password", (req, res) => {
         [hashedTempPassword, expirationTime, email],
         function (err) {
             if (err) {
+                console.log("Recover pwd error: ", err);
                 return res.status(500).json({ error: err.message });
             }
             if (this.changes === 0) {
+                console.log("Email not found for pwd recovery");
                 return res.status(400).json({ error: "Email not found" });
             }
 
@@ -107,6 +115,7 @@ app.post("/recover-password", (req, res) => {
             // Envoyer l'email
             transporter.sendMail(mailOptions, (error, info) => {
                 if (error) {
+                    console.log("Recover pwd email error: ", err);
                     return res.status(500).json({ error: error.message });
                 }
                 res.json({ message: "Password recovery email sent" });
@@ -126,9 +135,11 @@ app.post("/reset/:token", (req, res) => {
         [hashedPassword, token, Date.now()],
         function (err) {
             if (err) {
+                console.log("Password reset error: ", err);
                 return res.status(500).json({ error: err.message });
             }
             if (this.changes === 0) {
+                console.log("Invalid or expired token for pwd reset");
                 return res.status(400).json({ error: "Invalid or expired token" });
             }
             res.json({ message: "Password reset successful" });
@@ -150,12 +161,14 @@ app.post("/polls/create", upload.single("image"), (req, res) => {
             [pollId, userId, title, questionsString, votingPeriodStart, votingPeriodEnd, categoriesString, imageUrl],
             function (err) {
                 if (err) {
+                    console.log("Poll creation error: ", err);
                     return res.status(500).json({ error: err.message });
                 }
 
                 // Mettre à jour la liste des sondages créés par l'utilisateur
                 db.get("SELECT created_polls FROM users WHERE id = ?", [userId], (err, row) => {
                     if (err) {
+                        console.log("User polls fetch error: ", err);
                         return res.status(500).json({ error: err.message });
                     }
                     let createdPolls = row.created_polls ? JSON.parse(row.created_polls) : [];
@@ -165,6 +178,7 @@ app.post("/polls/create", upload.single("image"), (req, res) => {
                         [JSON.stringify(createdPolls), userId],
                         function (err) {
                             if (err) {
+                                console.log("User created_polls update error: ", err);
                                 return res.status(500).json({ error: err.message });
                             }
                             res.json({ id: pollId });
@@ -182,9 +196,11 @@ app.get("/poll/:id", (req, res) => {
 
     db.get("SELECT * FROM polls WHERE id = ?", [id], (err, row) => {
         if (err) {
+            console.log("Polls fetch error: ", err);
             return res.status(500).json({ error: err.message });
         }
         if (!row) {
+            console.log("Polls not found");
             return res.status(404).json({ error: "Poll not found" });
         }
         res.json(row);
@@ -197,6 +213,7 @@ app.get("/polls/user/:id", (req, res) => {
 
     db.all("SELECT * FROM polls WHERE creator_id = ?", [id], (err, rows) => {
         if (err) {
+            console.log("User polls fetch error: ", err);
             return res.status(500).json({ error: err.message });
         }
         res.json(rows);
@@ -207,6 +224,7 @@ app.get("/polls/user/:id", (req, res) => {
 app.get("/polls/featured", (req, res) => {
     db.all("SELECT * FROM polls ORDER BY RANDOM() LIMIT 5", (err, rows) => {
         if (err) {
+            console.log("Featured polls fetch error: ", err);
             return res.status(500).json({ error: err.message });
         }
         res.json(rows);
@@ -219,9 +237,11 @@ app.get("/user/:id", (req, res) => {
 
     db.get("SELECT * FROM users WHERE id = ?", [id], (err, row) => {
         if (err) {
+            console.log("User Error: ", err);
             return res.status(500).json({ error: err.message });
         }
         if (!row) {
+            console.log("User not found");
             return res.status(404).json({ error: "User not found" });
         }
         res.json(row);

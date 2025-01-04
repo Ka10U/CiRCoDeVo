@@ -16,7 +16,7 @@ const UserProfile = () => {
                 const response = await axios.get(`http://localhost:3000/user/${userId}`);
                 setUser(response.data);
             } catch (error) {
-                alert("Failed to fetch user data");
+                alert("Failed to fetch user data! Error:", error);
             }
         };
         fetchUser();
@@ -28,7 +28,7 @@ const UserProfile = () => {
                 const response = await axios.get(`http://localhost:3000/polls/user/${userId}`);
                 setPolls(response.data);
             } catch (error) {
-                alert("Failed to fetch polls");
+                alert("Failed to fetch polls. Error:", error);
             }
         };
         fetchPolls();

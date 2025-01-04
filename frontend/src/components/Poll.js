@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
+import PollVote from "./PollVote";
 
 const Poll = () => {
     const { id } = useParams();
@@ -27,8 +28,8 @@ const Poll = () => {
         return <div>Loading...</div>;
     }
 
-    const questions = JSON.parse(poll.questions);
-    const categories = JSON.parse(poll.categories);
+    const questions = JSON.parse(JSON.parse(poll.questions));
+    const categories = JSON.parse(JSON.parse(poll.categories));
     const isVotingPeriodOver = Date.now() > poll.voting_period_end;
 
     return (
@@ -61,42 +62,16 @@ const Poll = () => {
                                     <p>Value: {votes[index] || "Not Voted"}</p>
                                 </div>
                             )}
+                            {question.type === "text" && (
+                                <div>
+                                    <p>Text: {votes[index] || "Not Voted"}</p>
+                                </div>
+                            )}
                         </div>
                     ))}
                 </div>
             ) : (
-                <div>
-                    <h3>Vote</h3>
-                    {questions.map((question, index) => (
-                        <div key={index}>
-                            <h4>{question.text}</h4>
-                            {question.type === "referendum" && (
-                                <div>
-                                    <button onClick={() => handleVote(index, 0)}>Oui</button>
-                                    <button onClick={() => handleVote(index, 1)}>Non</button>
-                                </div>
-                            )}
-                            {question.type === "ranked_choice" && (
-                                <div>
-                                    {question.choices.map((choice, choiceIndex) => (
-                                        <button key={choiceIndex} onClick={() => handleVote(index, choiceIndex)}>
-                                            {choice}
-                                        </button>
-                                    ))}
-                                </div>
-                            )}
-                            {question.type === "value" && (
-                                <div>
-                                    <input
-                                        type="number"
-                                        value={votes[index] || ""}
-                                        onChange={(e) => handleVote(index, e.target.value)}
-                                    />
-                                </div>
-                            )}
-                        </div>
-                    ))}
-                </div>
+                <PollVote pollId={id} />
             )}
         </div>
     );

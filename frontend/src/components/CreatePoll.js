@@ -25,6 +25,16 @@ const CreatePoll = () => {
     const handleQuestionChange = (index, field, value) => {
         const newQuestions = [...questions];
         newQuestions[index][field] = value;
+        if (
+            (field === "type" && ["value", "text"].includes(value)) ||
+            (field === "type" &&
+                value === "ranked_choice" &&
+                newQuestions[index].choices.length === 2 &&
+                newQuestions[index].choices[0] === "Oui" &&
+                newQuestions[index].choices[1] === "Non")
+        ) {
+            newQuestions[index].choices = [""];
+        }
         setQuestions(newQuestions);
     };
 
@@ -79,7 +89,8 @@ const CreatePoll = () => {
             console.log(response.data);
             navigate("/");
         } catch (error) {
-            alert("Poll creation failed");
+            console.log("Poll creation failed. error: ", error);
+            alert("Poll creation failed. error: ", error);
         }
     };
 
@@ -124,6 +135,20 @@ const CreatePoll = () => {
                             </label>
                         ))}
                     </div>
+                    <div className="voting-period">
+                        <label>Poll start</label>
+                        <input
+                            type="datetime-local"
+                            value={votingPeriodStart}
+                            onChange={(e) => setVotingPeriodStart(e.target.value)}
+                        />
+                        <label>Poll end</label>
+                        <input
+                            type="datetime-local"
+                            value={votingPeriodEnd}
+                            onChange={(e) => setVotingPeriodEnd(e.target.value)}
+                        />{" "}
+                    </div>
                     {questions.map((question, index) => (
                         <div className="question" key={index}>
                             <div>
@@ -141,6 +166,7 @@ const CreatePoll = () => {
                                     <option value="referendum">Referendum</option>
                                     <option value="ranked_choice">Ranked Choice</option>
                                     <option value="value">Value</option>
+                                    <option value="text">Text</option>
                                 </select>
                                 <button className="remove" type="button" onClick={(e) => handleRemoveQuestion(index)}>
                                     X
@@ -149,9 +175,8 @@ const CreatePoll = () => {
                             {question.type === "ranked_choice" && (
                                 <div>
                                     {question.choices.map((choice, choiceIndex) => (
-                                        <div className="choice">
+                                        <div className="choice" key={choiceIndex}>
                                             <input
-                                                key={choiceIndex}
                                                 type="text"
                                                 placeholder={`Choice ${choiceIndex + 1}`}
                                                 value={choice}
@@ -180,12 +205,6 @@ const CreatePoll = () => {
                         Add Question
                     </button>
                     {/* TODO Handle error cases where start date is after end date && case where end date is befo */}
-                    <input
-                        type="datetime-local"
-                        value={votingPeriodStart}
-                        onChange={(e) => setVotingPeriodStart(e.target.value)}
-                    />
-                    <input type="datetime-local" value={votingPeriodEnd} onChange={(e) => setVotingPeriodEnd(e.target.value)} />{" "}
                     <button type="submit">Create Poll</button>
                 </form>
             </div>

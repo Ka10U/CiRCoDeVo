@@ -12,7 +12,9 @@ const Landing = () => {
             try {
                 const response = await axios.get("http://localhost:3000/polls/featured");
                 setFeaturedPolls(response.data);
+                console.log("Fetched polls: ", response.data);
             } catch (error) {
+                console.log("Failed to fetch featured polls");
                 alert("Failed to fetch featured polls");
             }
         };
@@ -26,6 +28,14 @@ const Landing = () => {
                     <h1>Welcome to your CIRCODEVO App</h1>
                     <h3>It's all about Collective Intelligence.</h3>
                     <p>You can check below trending discussions and upcoming votes...</p>
+                    <div>
+                        <h2>Featured Polls</h2>
+                        <div className="poll-list">
+                            {featuredPolls.map((poll) => (
+                                <PollCard key={poll.id} poll={poll} />
+                            ))}
+                        </div>
+                    </div>
                 </>
             ) : (
                 <>
@@ -36,14 +46,6 @@ const Landing = () => {
                         This web platform aims at promoting Collective Intelligence and provides a technical solution based upon
                         Ranked Choice Voting with optional vote Delegation.
                     </p>
-                    <div>
-                        <h2>Featured Polls</h2>
-                        <div className="poll-list">
-                            {featuredPolls.map((poll) => (
-                                <PollCard key={poll.id} poll={poll} />
-                            ))}
-                        </div>
-                    </div>
                 </>
             )}
         </div>

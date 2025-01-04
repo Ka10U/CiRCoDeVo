@@ -25,6 +25,7 @@ const AuthProvider = ({ children }) => {
         setUserId(userId);
         // Sauvegarder l'ID de l'utilisateur dans le localStorage
         localStorage.setItem("userId", userId);
+        console.log("USER LOGGED IN");
     };
 
     const logout = () => {
@@ -33,6 +34,7 @@ const AuthProvider = ({ children }) => {
         setUserId(null);
         // Supprimer l'ID de l'utilisateur du localStorage
         localStorage.removeItem("userId");
+        console.log("USER LOGGED OUT");
     };
 
     return <AuthContext.Provider value={{ isAuthenticated, userId, login, logout }}>{children}</AuthContext.Provider>;

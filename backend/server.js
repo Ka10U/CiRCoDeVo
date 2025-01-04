@@ -11,14 +11,14 @@ const path = require("path");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 
-dotenv.config();
+dotenv.config({ path: "../.env" });
 
 const app = express();
 app.use(bodyParser.json());
 app.use(cors());
 
-console.log("Server starting up...");
-console.log("Web Token: ", process.env.JWT_SECRET);
+// console.log("Server starting up...");
+// console.log("Web Token: ", process.env.JWT_SECRET);
 
 // Configuration de Multer pour gérer les téléchargements de fichiers
 const storage = multer.diskStorage({
@@ -171,7 +171,7 @@ app.post("/polls/create", upload.single("image"), (req, res) => {
                         console.log("User polls fetch error: ", err);
                         return res.status(500).json({ error: err.message });
                     }
-                    let createdPolls = row.created_polls ? JSON.parse(row.created_polls) : [];
+                    let createdPolls = row.created_polls ? JSON.parse(JSON.parse(row.created_polls)) : [];
                     createdPolls.push(pollId);
                     db.run(
                         "UPDATE users SET created_polls = ? WHERE id = ?",
@@ -246,6 +246,23 @@ app.get("/user/:id", (req, res) => {
         }
         res.json(row);
     });
+});
+
+// Route pour soumettre un vote
+app.post("/poll/:id/vote", (req, res) => {
+    const { id } = req.params;
+    const { userId, votes } = req.body;
+
+    db.run(
+        "INSERT INTO votes (id, poll_id, user_id, vote_data) VALUES (?, ?, ?, ?)",
+        [uuidv4(), id, userId, JSON.stringify(votes)],
+        function (err) {
+            if (err) {
+                return res.status(500).json({ error: err.message });
+            }
+            res.json({ message: "Vote submitted successfully" });
+        }
+    );
 });
 
 // Servir les images téléchargées

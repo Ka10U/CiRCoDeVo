@@ -12,11 +12,14 @@ const UserProfile = () => {
 
     useEffect(() => {
         const fetchUser = async () => {
-            try {
-                const response = await axios.get(`http://localhost:3000/user/${userId}`);
-                setUser(response.data);
-            } catch (error) {
-                alert("Failed to fetch user data! Error:", error);
+            if (userId !== null) {
+                console.log("fetching user profile with userId: ", userId);
+                try {
+                    const response = await axios.get(`http://localhost:3000/user/${userId}`);
+                    setUser(response.data);
+                } catch (error) {
+                    alert("Failed to fetch user data! Error:", error);
+                }
             }
         };
         fetchUser();
@@ -24,11 +27,14 @@ const UserProfile = () => {
 
     useEffect(() => {
         const fetchPolls = async () => {
-            try {
-                const response = await axios.get(`http://localhost:3000/polls/user/${userId}`);
-                setPolls(response.data);
-            } catch (error) {
-                alert("Failed to fetch polls. Error:", error);
+            if (userId !== null) {
+                console.log("fetching polls from userId: ", userId);
+                try {
+                    const response = await axios.get(`http://localhost:3000/polls/user/${userId}`);
+                    setPolls(response.data);
+                } catch (error) {
+                    alert("Failed to fetch polls. Error:", error);
+                }
             }
         };
         fetchPolls();

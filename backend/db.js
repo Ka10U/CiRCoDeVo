@@ -33,6 +33,12 @@ db.serialize(() => {
         FOREIGN KEY (poll_id) REFERENCES polls (id),
         FOREIGN KEY (user_id) REFERENCES users (id)
     )`);
+
+    db.run(`CREATE TABLE IF NOT EXISTS results (
+        poll_id TEXT PRIMARY KEY,
+        results TEXT,
+        FOREIGN KEY (poll_id) REFERENCES polls (id)
+    )`);
 });
 
 module.exports = db;

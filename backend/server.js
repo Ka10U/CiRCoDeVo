@@ -11,6 +11,8 @@ const path = require("path");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 
+const computeResults = require("./computeResults");
+
 dotenv.config({ path: "../.env" });
 
 const app = express();
@@ -258,11 +260,57 @@ app.post("/poll/:id/vote", (req, res) => {
         [uuidv4(), id, userId, JSON.stringify(votes)],
         function (err) {
             if (err) {
+                console.log("Could not process vote. Error: ", err);
                 return res.status(500).json({ error: err.message });
             }
             res.json({ message: "Vote submitted successfully" });
         }
     );
+});
+
+// Route pour calculer les résultats d'un sondage
+app.get("/poll/:id/results", (req, res) => {
+    const { id } = req.params;
+
+    db.get("SELECT * FROM results WHERE id = ?", [id], (err, dbResults) => {
+        if (err) {
+            console.log("Failed to fetch poll results. Error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        if (!dbResults) {
+            db.get("SELECT * FROM polls WHERE id = ?", [id], (err, poll) => {
+                if (err) {
+                    console.log("Failed to fetch poll results. Error:", err);
+                    return res.status(500).json({ error: err.message });
+                }
+                if (!poll) {
+                    console.log("Poll not found");
+                    return res.status(404).json({ error: "Poll not found" });
+                }
+
+                // Récupérer les votes pour ce sondage
+                db.all("SELECT * FROM votes WHERE poll_id = ?", [id], (err, votes) => {
+                    if (err) {
+                        console.log("Failed to fetch votes. Error:", err);
+                        return res.status(500).json({ error: err.message });
+                    }
+
+                    const results = computeResults(jSON.parse(JSON.parse(votes)));
+
+                    // Insérer les résultats dans la table results
+                    db.run("INSERT INTO results (poll_id, results) VALUES (?, ?)", [id, JSON.stringify(results)], function (err) {
+                        if (err) {
+                            console.log("Failed to save poll results. Error:", err);
+                            return res.status(500).json({ error: err.message });
+                        }
+                        res.json(results);
+                    });
+                });
+            });
+        } else {
+            res.json(dbResults);
+        }
+    });
 });
 
 // Servir les images téléchargées

@@ -236,3 +236,18 @@ button.remove:hover {
     align-items: center;
     gap: 8px;
 }
+
+.choice-vote {
+    padding: 2px;
+    margin: 2px;
+    width: 260px;
+    border-radius: 4px;
+}
+
+.valid-choice{
+    background-color: #55bada;
+}
+
+.white-vote{
+    background-color: #71888f;
+}

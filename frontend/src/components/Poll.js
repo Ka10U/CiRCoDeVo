@@ -20,10 +20,6 @@ const Poll = () => {
         fetchPoll();
     }, [id]);
 
-    const handleVote = (questionIndex, choiceIndex) => {
-        setVotes({ ...votes, [questionIndex]: choiceIndex });
-    };
-
     if (!poll) {
         return <div>Loading...</div>;
     }

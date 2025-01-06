@@ -6,7 +6,7 @@ import RankedChoiceSelector from "./RankedChoiceSelector";
 const PollVote = ({ pollId }) => {
     const [questions, setQuestions] = useState([]);
     const [votes, setVotes] = useState({});
-    const [selectedChoices, setSelectedChoices] = useState({});
+    // const [selectedChoices, setSelectedChoices] = useState({});
 
     useEffect(() => {
         const fetchPoll = async () => {
@@ -23,48 +23,58 @@ const PollVote = ({ pollId }) => {
             [questionIndex]: choiceIndex,
         }));
 
-        setSelectedChoices((prevChoices) => ({
-            ...prevChoices,
-            [questionIndex]: choiceIndex,
-        }));
+        // setSelectedChoices((prevChoices) => ({
+        //     ...prevChoices,
+        //     [questionIndex]: choiceIndex,
+        // }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("questions: ", questions);
-        console.log("votes: ", votes);
-        console.log("selectedChoices: ", selectedChoices);
-        // try {
-        //     const response = await axios.post(`http://localhost:3000/poll/${pollId}/vote`, {
-        //         userId: localStorage.getItem("userId"), // Utiliser l'ID de l'utilisateur authentifié
-        //         votes: votes,
-        //     });
-        //     console.log(response.data);
-        //     alert("Vote submitted successfully");
-        // } catch (error) {
-        //     alert("Vote submission failed. Error:", error);
-        // }
+        try {
+            const response = await axios.post(`http://localhost:3000/poll/${pollId}/vote`, {
+                userId: localStorage.getItem("userId"), // Utiliser l'ID de l'utilisateur authentifié
+                votes: votes,
+            });
+            console.log(response.data);
+            console.log("Vote submitted successfully");
+        } catch (error) {
+            alert("Vote submission failed. Error:", error);
+        }
+    };
+
+    const handleRankedChoiceVote = (questionIndex, choices) => {
+        setVotes((prevVotes) => ({
+            ...prevVotes,
+            [questionIndex]: choices,
+        }));
     };
 
     return (
         <div>
             <h2>Vote for Poll</h2>
-            {questions.map((question, index) => (
-                <div key={index}>
+            {questions.map((question, questionIndex) => (
+                <div key={questionIndex} className="questions-vote">
                     <p>{question.text}</p>
                     {question.type === "referendum" && (
                         <div>
-                            <button onClick={() => handleVote(index, 0)}>Yes</button>
-                            <button onClick={() => handleVote(index, 1)}>No</button>
+                            <button onClick={() => handleVote(questionIndex, 1)}>Yes</button>
+                            <button onClick={() => handleVote(questionIndex, 0)}>No</button>
                         </div>
                     )}
-                    {question.type === "ranked_choice" && <RankedChoiceSelector questionData={question} />}
+                    {question.type === "ranked_choice" && (
+                        <RankedChoiceSelector
+                            questionData={question}
+                            handler={handleRankedChoiceVote}
+                            questionId={questionIndex}
+                        />
+                    )}
                     {question.type === "value" && (
                         <div>
                             <input
                                 type="number"
                                 placeholder="Enter your value"
-                                onChange={(e) => handleVote(index, e.target.value)}
+                                onChange={(e) => handleVote(questionIndex, e.target.value)}
                             />
                         </div>
                     )}
@@ -73,7 +83,7 @@ const PollVote = ({ pollId }) => {
                             <input
                                 type="text"
                                 placeholder="Enter your answer"
-                                onChange={(e) => handleVote(index, e.target.value)}
+                                onChange={(e) => handleVote(questionIndex, e.target.value)}
                             />
                         </div>
                     )}

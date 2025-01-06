@@ -229,6 +229,12 @@ button.remove:hover {
     padding: 8px;
 }
 
+.questions-vote {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
 .choice {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -242,12 +248,41 @@ button.remove:hover {
     margin: 2px;
     width: 260px;
     border-radius: 4px;
+    cursor: grab;
+    user-select: none;
+    display: flex;
+    flex-direction: row;
+    gap: 8px;
+}
+
+.dragged {
+    cursor: grabbing;
+    background-color: #bada55;
 }
 
 .valid-choice{
     background-color: #55bada;
+    transition: background-color color 1s;
+}
+
+.white-threshold{
+    background-color: #474444;
+    color: white;
 }
 
 .white-vote{
     background-color: #71888f;
+    color: #484848;
+    text-decoration: line-through;
+}
+
+.ranked-id {
+    display: inline-block;
+    font-size: 900;
+    color: rgb(33, 26, 53);
+    background-color: #85dffa;
+    height: 21px;
+    width: 21px;
+    border-radius: 50%;
+    text-align: center;
 }

@@ -251,7 +251,7 @@ app.get("/user/:id", (req, res) => {
 });
 
 // Route pour soumettre un vote
-app.post("/poll/:id/vote", (req, res) => {
+app.post("/vote/poll/:id", (req, res) => {
     const { id } = req.params;
     const { userId, votes } = req.body;
 
@@ -268,8 +268,26 @@ app.post("/poll/:id/vote", (req, res) => {
     );
 });
 
+// Route pour vérifier si un vote a déjà été soumis par un utilisateur
+app.post("user/vote/poll/:pollId", (req, res) => {
+    const { pollId } = req.params;
+    const { userId } = req.body;
+
+    db.get("SELECT * FROM votes WHERE id = ? AND user_id = ?", [pollId, userId], (err, row) => {
+        if (err) {
+            console.log("Failed to fetch vote from user for current poll. Error:", err);
+            return res.status(500).json({ error: err.message });
+        }
+        if (!row) {
+            console.log("Poll not found");
+            return res.status(404).json({ error: "Poll not found" });
+        }
+        res.json(row);
+    });
+});
+
 // Route pour calculer les résultats d'un sondage
-app.get("/poll/:id/results", (req, res) => {
+app.get("/results/poll/:id/", (req, res) => {
     const { id } = req.params;
 
     db.get("SELECT * FROM results WHERE id = ?", [id], (err, dbResults) => {
@@ -280,7 +298,7 @@ app.get("/poll/:id/results", (req, res) => {
         if (!dbResults) {
             db.get("SELECT * FROM polls WHERE id = ?", [id], (err, poll) => {
                 if (err) {
-                    console.log("Failed to fetch poll results. Error:", err);
+                    console.log("Failed to fetch poll data. Error:", err);
                     return res.status(500).json({ error: err.message });
                 }
                 if (!poll) {

@@ -7,31 +7,51 @@ const Poll = () => {
     const { id } = useParams();
     const [poll, setPoll] = useState(null);
     const [votes, setVotes] = useState({});
+    const [hasVoted, setHasVoted] = useState(false);
 
     useEffect(() => {
         const fetchPoll = async () => {
             try {
                 const response = await axios.get(`http://localhost:3000/poll/${id}`);
-                setPoll(response.data);
+                setPoll(JSON.parse(JSON.parse(response.data)));
             } catch (error) {
                 alert("Failed to fetch poll");
             }
         };
+
+        const fetchVote = async () => {
+            try {
+                const response = await axios.get(`http://localhost:3000/user/vote/poll/${id}`, {
+                    userId: localStorage.getItem("userId"), // Utiliser l'ID de l'utilisateur authentifié
+                });
+                if (response.data) {
+                    setVotes(JSON.parse(JSON.parse(response.data)));
+                    setHasVoted(true);
+                }
+            } catch (error) {
+                console.log("User vote fetch error: ", error);
+            }
+        };
+
         fetchPoll();
+        fetchVote();
     }, [id]);
 
     if (!poll) {
         return <div>Loading...</div>;
     }
 
-    const questions = JSON.parse(JSON.parse(poll.questions));
-    const categories = JSON.parse(JSON.parse(poll.categories));
-    const isVotingPeriodOver = Date.now() > poll.voting_period_end;
+    const questions = JSON.parse(JSON.parse(poll?.questions ?? "[]"));
+    const categories = JSON.parse(JSON.parse(poll?.categories ?? "[]"));
+    const isVotingPeriodOver = Date.now() > poll?.voting_period_end ?? false;
 
     return (
         <div>
             <h2>{poll.title}</h2>
-            <p>Categories: {categories.join(", ")}</p>
+            <p>Categories:</p>{" "}
+            {categories.map((cat, catId) => (
+                <span key={catId}>{cat}</span>
+            ))}
             {isVotingPeriodOver ? (
                 <div>
                     <h3>Results</h3>
@@ -66,9 +86,14 @@ const Poll = () => {
                         </div>
                     ))}
                 </div>
-            ) : (
-                <PollVote pollId={id} />
-            )}
+            ) : 
+            ({hasVoted ? 
+                (
+                    <p>Vous avez participé à ce sondage!</p>
+                ) : (
+                    <PollVote pollId={id} />
+                )
+            }})
         </div>
     );
 };

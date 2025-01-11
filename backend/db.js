@@ -30,6 +30,7 @@ db.serialize(() => {
         poll_id TEXT,
         user_id TEXT,
         vote_data TEXT,
+        timestamp INTEGER,
         FOREIGN KEY (poll_id) REFERENCES polls (id),
         FOREIGN KEY (user_id) REFERENCES users (id)
     )`);

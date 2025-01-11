@@ -6,7 +6,6 @@ import RankedChoiceSelector from "./RankedChoiceSelector";
 const PollVote = ({ pollId }) => {
     const [questions, setQuestions] = useState([]);
     const [votes, setVotes] = useState({});
-    // const [selectedChoices, setSelectedChoices] = useState({});
 
     useEffect(() => {
         const fetchPoll = async () => {
@@ -17,22 +16,18 @@ const PollVote = ({ pollId }) => {
         fetchPoll();
     }, [pollId]);
 
-    const handleVote = (questionIndex, choiceIndex) => {
+    const handleVote = (questionIndex, choice) => {
+        let currentVote = { type: questions[questionIndex].type, value: choice };
         setVotes((prevVotes) => ({
             ...prevVotes,
-            [questionIndex]: choiceIndex,
+            questionIndex: currentVote,
         }));
-
-        // setSelectedChoices((prevChoices) => ({
-        //     ...prevChoices,
-        //     [questionIndex]: choiceIndex,
-        // }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post(`http://localhost:3000/poll/${pollId}/vote`, {
+            const response = await axios.post(`http://localhost:3000/vote/poll/${pollId}`, {
                 userId: localStorage.getItem("userId"), // Utiliser l'ID de l'utilisateur authentifié
                 votes: votes,
             });
@@ -44,9 +39,10 @@ const PollVote = ({ pollId }) => {
     };
 
     const handleRankedChoiceVote = (questionIndex, choices) => {
+        let currentVote = { type: questions[questionIndex].type, value: choices };
         setVotes((prevVotes) => ({
             ...prevVotes,
-            [questionIndex]: choices,
+            questionIndex: currentVote,
         }));
     };
 

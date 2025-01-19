@@ -77,6 +77,8 @@ const CreatePoll = () => {
             return;
         }
 
+        console.log("Questions:", questions);
+
         const formData = new FormData();
         formData.append("image", image);
         formData.append("userId", userId); // Remplacez par l'ID de l'utilisateur authentifié

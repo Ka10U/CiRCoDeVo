@@ -166,13 +166,13 @@ button.remove:hover {
     width: 100%;
 }
 
-.create-poll form div:first-child {
+/* .create-poll form div:first-child {
     display: grid;
     grid-template-columns: 1fr auto auto;
     justify-content: center;
     align-items: center;
     gap: 12px;
-}
+} */
 
 .categories-list {
     display: grid;
@@ -218,7 +218,7 @@ button.remove:hover {
 
 .question {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: auto 1fr auto auto;
     justify-content: center;
     align-items: center;
     gap: 8px;
@@ -227,6 +227,15 @@ button.remove:hover {
     margin-top: 8px;
     margin-bottom: 8px;
     padding: 8px;
+}
+
+.question span {
+    cursor: pointer;
+    user-select: none;
+}
+
+.question-choices {
+    grid-column: span 4;
 }
 
 .questions-vote {
@@ -260,17 +269,17 @@ button.remove:hover {
     background-color: #bada55;
 }
 
-.valid-choice{
+.valid-choice {
     background-color: #55bada;
     transition: background-color color 1s;
 }
 
-.white-threshold{
+.white-threshold {
     background-color: #474444;
     color: white;
 }
 
-.white-vote{
+.white-vote {
     background-color: #71888f;
     color: #484848;
     text-decoration: line-through;

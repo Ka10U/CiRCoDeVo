@@ -13,9 +13,9 @@ const Poll = () => {
         const fetchPoll = async () => {
             try {
                 const response = await axios.get(`http://localhost:3000/poll/${id}`);
-                setPoll(JSON.parse(JSON.parse(response.data)));
+                setPoll(response.data);
             } catch (error) {
-                alert("Failed to fetch poll");
+                console.log("Failed to fetch poll. Error:", error);
             }
         };
 
@@ -25,8 +25,12 @@ const Poll = () => {
                     userId: localStorage.getItem("userId"), // Utiliser l'ID de l'utilisateur authentifié
                 });
                 if (response.data) {
-                    setVotes(JSON.parse(JSON.parse(response.data)));
+                    console.log("Current user has alredy voted on this poll.");
+                    setVotes(response.data);
                     setHasVoted(true);
+                } else {
+                    console.log("No vote found for current user on this poll");
+                    setVotes({});
                 }
             } catch (error) {
                 console.log("User vote fetch error: ", error);
@@ -41,8 +45,8 @@ const Poll = () => {
         return <div>Loading...</div>;
     }
 
-    const questions = JSON.parse(JSON.parse(poll?.questions ?? "[]"));
-    const categories = JSON.parse(JSON.parse(poll?.categories ?? "[]"));
+    const questions = JSON.parse(poll?.questions ?? "[]");
+    const categories = JSON.parse(poll?.categories ?? "[]");
     const isVotingPeriodOver = Date.now() > poll?.voting_period_end ?? false;
 
     return (
@@ -86,14 +90,11 @@ const Poll = () => {
                         </div>
                     ))}
                 </div>
-            ) : 
-            ({hasVoted ? 
-                (
-                    <p>Vous avez participé à ce sondage!</p>
-                ) : (
-                    <PollVote pollId={id} />
-                )
-            }})
+            ) : hasVoted ? (
+                <p>Vous avez participé à ce sondage!</p>
+            ) : (
+                <PollVote pollId={id} />
+            )}
         </div>
     );
 };

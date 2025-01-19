@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import SortableList, { SortableItem } from "react-easy-sort";
 import { arrayMoveImmutable } from "array-move";
 

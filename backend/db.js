@@ -8,9 +8,7 @@ db.serialize(() => {
         username TEXT UNIQUE,
         email TEXT UNIQUE,
         password TEXT,
-        temp_password_expiration INTEGER,
-        created_polls TEXT,
-        participated_polls TEXT
+        temp_password_expiration INTEGER
     )`);
 
     db.run(`CREATE TABLE IF NOT EXISTS polls (

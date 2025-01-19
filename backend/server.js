@@ -157,39 +157,18 @@ app.post("/polls/create", upload.single("image"), (req, res) => {
     const categoriesString = JSON.stringify(categories);
     const imageUrl = req.file ? `http://localhost:3000/uploads/${req.file.filename}` : null;
 
-    db.serialize(() => {
-        db.run(
-            "INSERT INTO polls (id, creator_id, title, questions, voting_period_start, voting_period_end, categories, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [pollId, userId, title, questionsString, votingPeriodStart, votingPeriodEnd, categoriesString, imageUrl],
-            function (err) {
-                if (err) {
-                    console.log("Poll creation error: ", err);
-                    return res.status(500).json({ error: err.message });
-                }
-
-                // Mettre à jour la liste des sondages créés par l'utilisateur
-                db.get("SELECT created_polls FROM users WHERE id = ?", [userId], (err, row) => {
-                    if (err) {
-                        console.log("User polls fetch error: ", err);
-                        return res.status(500).json({ error: err.message });
-                    }
-                    let createdPolls = row.created_polls ? JSON.parse(JSON.parse(row.created_polls)) : [];
-                    createdPolls.push(pollId);
-                    db.run(
-                        "UPDATE users SET created_polls = ? WHERE id = ?",
-                        [JSON.stringify(createdPolls), userId],
-                        function (err) {
-                            if (err) {
-                                console.log("User created_polls update error: ", err);
-                                return res.status(500).json({ error: err.message });
-                            }
-                            res.json({ id: pollId });
-                        }
-                    );
-                });
+    // db.serialize(() => {
+    db.run(
+        "INSERT INTO polls (id, creator_id, title, questions, voting_period_start, voting_period_end, categories, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+        [pollId, userId, title, questionsString, votingPeriodStart, votingPeriodEnd, categoriesString, imageUrl],
+        function (err) {
+            if (err) {
+                console.log("Poll creation error: ", err);
+                return res.status(500).json({ error: err.message });
             }
-        );
-    });
+        }
+    );
+    // });
 });
 
 // Route pour afficher un sondage
@@ -269,7 +248,7 @@ app.post("/vote/poll/:id", (req, res) => {
 });
 
 // Route pour vérifier si un vote a déjà été soumis par un utilisateur
-app.post("user/vote/poll/:pollId", (req, res) => {
+app.get("user/vote/poll/:pollId", (req, res) => {
     const { pollId } = req.params;
     const { userId } = req.body;
 
@@ -279,8 +258,8 @@ app.post("user/vote/poll/:pollId", (req, res) => {
             return res.status(500).json({ error: err.message });
         }
         if (!row) {
-            console.log("Poll not found");
-            return res.status(404).json({ error: "Poll not found" });
+            console.log("Vote not found");
+            return res.status(204).json({ message: "Current user has not voted yet" });
         }
         res.json(row);
     });

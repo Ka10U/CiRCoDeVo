@@ -50,7 +50,7 @@ const PollVote = ({ pollId }) => {
         <div>
             <h2>Vote for Poll</h2>
             {questions.map((question, questionIndex) => (
-                <div key={questionIndex} className="questions-vote">
+                <div key={`question-${questionIndex}`} className="questions-vote">
                     <p>{question.text}</p>
                     {question.type === "referendum" && (
                         <div>

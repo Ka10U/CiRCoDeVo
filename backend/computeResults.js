@@ -1,3 +1,5 @@
+// voteData: [{"question_0": {"type": "text", "value": "answer"}, "question_1": {"type": "ranked", "value": ["answer_1", "answer_2"], "quesiton_2": {"type": "referendum", "value": "yes"} }]
+
 const computeResults = (data) => {
     const results = {};
     data.forEach((vote) => {

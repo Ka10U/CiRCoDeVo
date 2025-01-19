@@ -3,6 +3,9 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./AuthContext";
 
+import SortableList, { SortableItem } from "react-easy-sort";
+import { arrayMoveImmutable } from "array-move";
+
 const CreatePoll = () => {
     const [title, setTitle] = useState("");
     const [questions, setQuestions] = useState([{ type: "referendum", text: "", choices: ["Oui", "Non"] }]);
@@ -63,6 +66,10 @@ const CreatePoll = () => {
         setImage(e.target.files[0]);
     };
 
+    const onQuestionsSortEnd = (oldIndex, newIndex) => {
+        setQuestions((array) => arrayMoveImmutable(array, oldIndex, newIndex));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!isAuthenticated) {
@@ -74,10 +81,10 @@ const CreatePoll = () => {
         formData.append("image", image);
         formData.append("userId", userId); // Remplacez par l'ID de l'utilisateur authentifié
         formData.append("title", title);
-        formData.append("questions", JSON.stringify(questions));
+        formData.append("questions", questions);
         formData.append("votingPeriodStart", votingPeriodStart);
         formData.append("votingPeriodEnd", votingPeriodEnd);
-        formData.append("categories", JSON.stringify(categories));
+        formData.append("categories", categories);
 
         try {
             const response = await axios.post("http://localhost:3000/polls/create", formData, {
@@ -149,9 +156,13 @@ const CreatePoll = () => {
                             onChange={(e) => setVotingPeriodEnd(e.target.value)}
                         />{" "}
                     </div>
-                    {questions.map((question, index) => (
-                        <div className="question" key={index}>
-                            <div>
+                    <SortableList onSortEnd={onQuestionsSortEnd} className="list" draggedItemClassName="dragged">
+                        {questions.map((question, index) => (
+                            <div className="question" key={index}>
+                                <SortableItem>
+                                    <span>{+index + 1}</span>
+                                </SortableItem>
+
                                 <input
                                     // key={index}
                                     type="text"
@@ -171,36 +182,37 @@ const CreatePoll = () => {
                                 <button className="remove" type="button" onClick={(e) => handleRemoveQuestion(index)}>
                                     X
                                 </button>
+
+                                {question.type === "ranked_choice" && (
+                                    <div className="question-choices">
+                                        {question.choices.map((choice, choiceIndex) => (
+                                            <div className="choice" key={choiceIndex}>
+                                                <input
+                                                    type="text"
+                                                    placeholder={`Choice ${choiceIndex + 1}`}
+                                                    value={choice}
+                                                    onChange={(e) => handleChoiceChange(index, choiceIndex, e.target.value)}
+                                                />
+                                                <button
+                                                    className="remove"
+                                                    type="button"
+                                                    onClick={(e) => handleRemoveChoice(index, choiceIndex)}
+                                                >
+                                                    X
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleQuestionChange(index, "choices", [...question.choices, ""])}
+                                        >
+                                            Add Choice
+                                        </button>
+                                    </div>
+                                )}
                             </div>
-                            {question.type === "ranked_choice" && (
-                                <div>
-                                    {question.choices.map((choice, choiceIndex) => (
-                                        <div className="choice" key={choiceIndex}>
-                                            <input
-                                                type="text"
-                                                placeholder={`Choice ${choiceIndex + 1}`}
-                                                value={choice}
-                                                onChange={(e) => handleChoiceChange(index, choiceIndex, e.target.value)}
-                                            />
-                                            <button
-                                                className="remove"
-                                                type="button"
-                                                onClick={(e) => handleRemoveChoice(index, choiceIndex)}
-                                            >
-                                                X
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <button
-                                        type="button"
-                                        onClick={() => handleQuestionChange(index, "choices", [...question.choices, ""])}
-                                    >
-                                        Add Choice
-                                    </button>
-                                </div>
-                            )}
-                        </div>
-                    ))}
+                        ))}
+                    </SortableList>
                     <button type="button" onClick={handleAddQuestion}>
                         Add Question
                     </button>
